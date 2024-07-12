@@ -40,7 +40,8 @@ const Post = () => {
                         <Image
                             src="/like.png"
                             alt=""
-                            fill
+                            width={10}
+                            height={10}
                             className="cursor-pointer"
                         />
                         <span className="text-gray-300">|</span>
@@ -52,7 +53,8 @@ const Post = () => {
                         <Image
                             src="/comment.png"
                             alt=""
-                            fill
+                            width={10}
+                            height={10}
                             className="cursor-pointer"
                         />
                         <span className="text-gray-300">|</span>
@@ -67,13 +69,17 @@ const Post = () => {
                         <Image
                             src="/share.png"
                             alt=""
-                            fill
+                            width={10}
+                            height={10}
                             className="cursor-pointer"
                         />
                         <span className="text-gray-300">|</span>
                         <span className="text-gray-500">
                             123{" "}
-                            <span className="hidden md:inline"> Shares</span>
+                            <span className="hidden md:inline-block">
+                                {" "}
+                                Shares
+                            </span>
                         </span>
                     </div>
                 </div>
