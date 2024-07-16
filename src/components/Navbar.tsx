@@ -73,7 +73,7 @@ const Navbar = () => {
                     <SignedIn>
                         <div className="cursor-pointer">
                             <Image
-                                src="/people/png"
+                                src="/people.png"
                                 alt="People"
                                 width={24}
                                 height={24}
