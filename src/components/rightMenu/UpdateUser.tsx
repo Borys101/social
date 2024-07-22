@@ -1,14 +1,26 @@
 "use client";
 
+import { updateProfile } from "@/lib/actions";
 import { User } from "@prisma/client";
+import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useActionState, useState } from "react";
+import UpdateButton from "./UpdateButton";
 
 const UpdateUser = ({ user }: { user: User }) => {
     const [open, setOpen] = useState(false);
+    const [cover, setCover] = useState<any>();
+    const router = useRouter();
+    const [state, formAction] = useActionState(updateProfile, {
+        success: false,
+        error: false,
+    });
     const handleClose = () => {
         setOpen(false);
+        state.success && router.refresh();
     };
+
     return (
         <div>
             <span
@@ -20,7 +32,12 @@ const UpdateUser = ({ user }: { user: User }) => {
             {open && (
                 <div className="absolute w-screen h-screen top-0 left-0 bg-black bg-opacity-65 flex items-center justify-center z-50">
                     <form
-                        action=""
+                        action={(formData) =>
+                            formAction({
+                                formData,
+                                cover: cover?.secure_url || "",
+                            })
+                        }
                         className="p-12 bg-white rounded-lg shadow-md flex flex-col gap-2 w-full md:w-1/2 xl:w-1/3 relative"
                     >
                         <h2>Update Profile</h2>
@@ -28,21 +45,36 @@ const UpdateUser = ({ user }: { user: User }) => {
                             Use the navbar profile to change the avatar or
                             username.
                         </div>
-                        <div className="flex flex-col gap-4 my-4">
-                            <label htmlFor="">Cover Picture</label>
-                            <div className="flex items-center gap-2 cursor-pointer">
-                                <Image
-                                    src={user.cover || "/noCover.png"}
-                                    alt=""
-                                    width={48}
-                                    height={32}
-                                    className="w-12 h-8 rounded-md object-cover"
-                                />
-                                <span className="text-xs underline text-gray-600">
-                                    Change
-                                </span>
-                            </div>
-                        </div>
+                        <CldUploadWidget
+                            uploadPreset="<social>"
+                            onSuccess={(result) => setCover(result.info)}
+                        >
+                            {({ open }) => {
+                                return (
+                                    <div
+                                        className="flex flex-col gap-4 my-4"
+                                        onClick={() => open()}
+                                    >
+                                        <label htmlFor="">Cover Picture</label>
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Image
+                                                src={
+                                                    user.cover || "/noCover.png"
+                                                }
+                                                alt=""
+                                                width={48}
+                                                height={32}
+                                                className="w-12 h-8 rounded-md object-cover"
+                                            />
+                                            <span className="text-xs underline text-gray-600">
+                                                Change
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            }}
+                        </CldUploadWidget>
+
                         <div className="flex flex-wrap justify-between gap-2 xl:gap-4">
                             <div className="flex flex-col gap-4">
                                 <label
@@ -55,6 +87,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                     type="text"
                                     placeholder={user.name || "John"}
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="name"
                                 />
                             </div>
 
@@ -69,6 +102,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                     type="text"
                                     placeholder={user.surname || "Doe"}
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="surname"
                                 />
                             </div>
                             <div className="flex flex-col gap-4">
@@ -85,6 +119,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                         "Life is beautiful..."
                                     }
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="description"
                                 />
                             </div>
                             <div className="flex flex-col gap-4">
@@ -98,6 +133,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                     type="text"
                                     placeholder={user.city || "New York"}
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="city"
                                 />
                             </div>
                             <div className="flex flex-col gap-4">
@@ -111,6 +147,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                     type="text"
                                     placeholder={user.school || "MIT"}
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="school"
                                 />
                             </div>
                             <div className="flex flex-col gap-4">
@@ -124,6 +161,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                     type="text"
                                     placeholder={user.work || "Apple"}
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="work"
                                 />
                             </div>
                             <div className="flex flex-col gap-4">
@@ -139,12 +177,21 @@ const UpdateUser = ({ user }: { user: User }) => {
                                         user.website || "ownwebsite.be"
                                     }
                                     className="ring-1 ring-gray-300 p-[13px] rounded-md text-sm"
+                                    name="website"
                                 />
                             </div>
                         </div>
-                        <button className="bg-blue-500 p-2 mt-2 rounded-md text-white">
-                            Update
-                        </button>
+                        <UpdateButton />
+                        {state.success && (
+                            <span className="text-green-500">
+                                Profile has been updated!
+                            </span>
+                        )}
+                        {state.error && (
+                            <span className="text-red-500">
+                                Something went wrong!
+                            </span>
+                        )}
                     </form>
                     <div
                         className="absolute text-xl right-3 top-3 cursor-pointer"
