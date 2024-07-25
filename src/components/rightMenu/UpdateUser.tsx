@@ -58,9 +58,7 @@ const UpdateUser = ({ user }: { user: User }) => {
                                         <label htmlFor="">Cover Picture</label>
                                         <div className="flex items-center gap-2 cursor-pointer">
                                             <Image
-                                                src={
-                                                    user.cover || "/noCover.png"
-                                                }
+                                                src={user.cover || ""}
                                                 alt=""
                                                 width={48}
                                                 height={32}
